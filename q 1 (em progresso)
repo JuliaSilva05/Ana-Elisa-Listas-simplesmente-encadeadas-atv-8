@@ -1,0 +1,148 @@
+//Crie um programa para implementar uma agenda de contatos. Sobre cada contato, a agenda permitirá armazenar o nome, um telefone e um e-mail. Os contatos ficarão na agenda ordenados por  ordem  alfabética crescente de  nome. Não  é possível  mais  de  um  contato com um mesmo nome. Utilize uma lista simplesmente encadeada para implementar a agenda. 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct NoLSE {
+  char nome[100];
+  int telefone;
+  char email[50];
+  struct NoLSE* prox;
+} TNoLSE;
+
+typedef struct LseInt{
+  TNoLSE* inicio;
+  TNoLSE* fim;
+  int qtd;
+}LSEInteiros;
+
+void mostrarOpcoes(){
+  printf("\nOpções:\n");
+  printf("1 - Adicionar contato\n");
+  printf("2 - Remover contato\n");
+  printf("3 - Exibir contatos\n");
+  printf("4 - Procurar contato\n");
+  printf("5 - Alterar contato\n");
+  printf("0 - Encerrar programa\n");
+  printf("Digite a opção desejada: ");
+}
+
+void inicializar(LSEInteiros*lista){
+  lista->inicio = NULL;
+  lista->qtd = 0;
+  lista->fim = NULL;
+}
+
+int isEmpty(LSEInteiros*lista){
+  if ((lista->inicio == NULL) && (lista->fim==NULL) &&(lista->qtd==0)){
+    return 1;
+  } else{
+    return 0;
+  }
+}
+
+
+void adicionar(LSEInteiros*lista,int i, char name[i], int telephone, int j, char mail[j]){
+  TNoLSE* novo = (TNoLSE*) malloc(sizeof(TNoLSE));
+  strcpy(novo->nome,name);
+  novo->telefone = telephone;
+  strcpy(novo->email,mail);
+  novo->prox = NULL;
+  //lista->qtd++;
+  
+  if (isEmpty(lista)==1){
+    lista->inicio = novo;
+    lista->fim = novo;
+  } else{
+    lista->fim->prox = novo;
+    lista->fim = novo;
+  }
+}
+
+
+void imprimir(LSEInteiros lista){
+  TNoLSE* aux = lista.inicio;
+  while (aux != NULL){
+    printf("\nNome: %s",aux->nome);
+    printf("Telefone: %d\n",aux->telefone);
+    printf("E-mail: %s",aux->email);
+    printf("%d",lista.qtd);
+    aux = aux->prox;
+    printf("\n");
+  }
+}
+
+int isFull(LSEInteiros*lista){
+  return 0;
+}
+
+int jaExiste(LSEInteiros*lista, char name[100]){
+  TNoLSE* aux = lista->inicio;
+  while (aux != NULL){
+    if (strcmp(aux->nome,name)==0){
+      return 1;
+    }
+    aux = aux->prox;
+  }
+  return 0;
+}
+
+int main(void) {
+  LSEInteiros listaInteiros;
+  inicializar(&listaInteiros);
+  int op, phone;
+  char name[100], mail[50];
+  do{
+    mostrarOpcoes();
+    scanf("%d",&op);
+    switch(op){
+      case 1:
+        setbuf(stdin,NULL);
+        printf("\nDiga o nome do contato: ");
+        fgets(name,100,stdin);
+        if (jaExiste(&listaInteiros, name) == 0){
+          printf("Diga o número do contato: ");
+          scanf("%d",&phone);
+          setbuf(stdin,NULL);
+          printf("Diga o e-mail do contato: ");
+          fgets(mail,50,stdin);
+        
+          adicionar(&listaInteiros,100,name,phone, 50,mail);
+          listaInteiros.qtd++;
+          printf("Adicionado com sucesso!\n");
+          
+        } else{
+          printf("O nome não pode ser repetido!\n");
+        }
+        
+        break;
+      case 2:
+
+        break;
+      case 3:
+        if (isEmpty(&listaInteiros)==1){
+          printf("Lista vazia\n");
+        } else{
+          imprimir(listaInteiros);
+        }
+        break;
+      case 4:
+
+        break;
+      case 5:
+
+        break;
+      case 0:
+        printf("Fim de programa!\n");
+        break;
+      default:
+        printf("Opção inválida!\n");
+    }
+    
+  } while(op != 0);
+
+
+  
+  return 0;
+}
