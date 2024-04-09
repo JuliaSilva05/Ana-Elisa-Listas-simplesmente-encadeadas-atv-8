@@ -1,0 +1,275 @@
+//Crie um programa para implementar uma agenda de contatos. Sobre cada contato, a agenda permitirá armazenar o nome, um telefone e um e-mail. Os contatos ficarão na agenda ordenados por  ordem  alfabética crescente de  nome. Não  é possível  mais  de  um  contato com um mesmo nome. Utilize uma lista simplesmente encadeada para implementar a agenda. 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct NoLSE {
+  char nome[100];
+  char telefone[20];
+  char email[50];
+  struct NoLSE* prox;
+} TNoLSE;
+
+typedef struct LseInt{
+  TNoLSE* inicio;
+  TNoLSE* fim;
+  int qtd;
+}LSEInteiros;
+
+void mostrarOpcoes(){
+  printf("\nOpções:\n");
+  printf("1 - Adicionar contato\n");
+  printf("2 - Remover contato\n");
+  printf("3 - Exibir contatos\n");
+  printf("4 - Procurar contato\n");
+  printf("5 - Alterar contato\n");
+  printf("0 - Encerrar programa\n");
+  printf("Digite a opção desejada: ");
+}
+
+void inicializar(LSEInteiros*lista){
+  lista->inicio = NULL;
+  lista->qtd = 0;
+  lista->fim = NULL;
+}
+
+int isEmpty(LSEInteiros*lista){
+  if ((lista->inicio == NULL) && (lista->fim==NULL) &&(lista->qtd==0)){
+    return 1;
+  } else{
+    return 0;
+  }
+}
+
+
+void adicionar(LSEInteiros*lista,int i, char name[i], int j,char telephone[j], int k, char mail[k]){
+  TNoLSE* novo = (TNoLSE*) malloc(sizeof(TNoLSE));
+  strcpy(novo->nome,name);
+  strcpy(novo->telefone,telephone);
+  //novo->telefone = telephone;
+  strcpy(novo->email,mail);
+  novo->prox = NULL;
+  //int l = 0;
+  
+  if (isEmpty(lista)==1){ //se tiver vazia
+    lista->inicio = novo;
+    lista->fim = novo;
+  } else{ //se nao tiver vazia
+    TNoLSE* atual= lista->inicio;
+    TNoLSE* anterior = NULL;
+    //colocando no final enquanto nao descubro um jeito de deixar em ordem alfabetica
+    //lista->fim->prox = novo;
+    //lista->fim = novo;
+    while(atual != NULL && strcmp(atual->nome, name)<0) {
+      anterior = atual;
+      atual = atual->prox;
+    }
+    if (anterior == NULL){ // ta no inicio
+      novo->prox = lista->inicio;
+      lista->inicio = novo;
+    } else{
+      anterior->prox = novo;
+      novo->prox = atual;
+    }
+    if (atual == NULL){ //ta no fim
+      lista ->fim = novo;
+    }
+  }
+}
+
+int jaExiste(LSEInteiros*lista, char name[100]){
+  TNoLSE* aux = lista->inicio;
+  while (aux != NULL){
+    if (strcmp(aux->nome,name)==0){
+      return 1;
+      free(aux);
+    }
+    aux = aux->prox;
+  }
+  free(aux);
+  return 0;
+}
+
+void remover(LSEInteiros*lista, char name[100]){
+  if (jaExiste(lista,name)==1){ //se ja existir
+    TNoLSE* aux = lista->inicio;
+    TNoLSE* anterior = NULL;
+    while (aux != NULL && strcmp(aux->nome,name)!=0){
+      anterior = aux;
+      aux = aux->prox;
+    }
+    if (anterior == NULL){ //se for o primeiro
+      lista->inicio = aux->prox;
+      aux->prox = NULL;
+    } else if (aux == lista->fim){
+      anterior->prox = NULL;
+      lista->fim = anterior;
+    } else{
+      anterior->prox = aux->prox;
+      aux->prox = NULL;
+    }
+    free(aux);
+    lista->qtd--;
+    printf("Removido %s\n",name);
+  } else{
+    printf("Este contato não existe na lista!\n");
+  }
+  if (lista->qtd == 0){
+    lista->inicio = NULL;
+    lista->fim = NULL;
+  }
+}
+
+void imprimir(LSEInteiros lista){
+  TNoLSE* aux = lista.inicio;
+  while (aux != NULL){
+    printf("\nNome: %s",aux->nome);
+    printf("Telefone: %s",aux->telefone);
+    printf("E-mail: %s",aux->email);
+    printf("%d",lista.qtd);
+    aux = aux->prox;
+    printf("\n");
+  }
+  free(aux);
+}
+
+int isFull(LSEInteiros*lista){
+  return 0;
+}
+
+TNoLSE* procurar(LSEInteiros*lista, char name[]){
+  int endereco = 0;
+  if (jaExiste(lista,name)==1){
+    TNoLSE* aux = lista->inicio;
+    //TNoLSE* anterior = NULL;
+    while (aux != NULL && strcmp(aux->nome,name)!=0){
+      //anterior = aux;
+      aux = aux->prox;
+    }
+    return aux;
+  } else{
+    return NULL;
+  }
+  
+}
+
+void alterar(LSEInteiros*lista, char name[100]){
+  if (procurar(lista,name)!=NULL){
+    TNoLSE* aux = lista->inicio;
+    while(aux!=NULL && strcmp(aux->nome,name)!=0){
+      aux = aux->prox;
+    }
+    printf("\nTelefone atual: %s",aux->telefone);
+    printf("E-mail atual: %s",aux->email);
+    printf("\n1 - Mudar o telefone\n2 - Mudar o e-mail: \n");
+    int opcao;
+    scanf("%d",&opcao);
+    switch(opcao){
+      case 1:
+        printf("Digite o novo telefone: ");
+        setbuf(stdin,NULL);
+        fgets(aux->telefone,20,stdin);
+        break;
+      case 2:
+        printf("Digite o novo e-mail: ");
+        setbuf(stdin,NULL);
+        fgets(aux->email,50,stdin);
+        break;
+      default:
+        printf("Opção inválida!");
+        break;
+    }
+  } else{
+    printf("Contato não existe na lista!\n");
+  }
+}
+
+
+
+int main(void) {
+  LSEInteiros listaOrdenada;
+  inicializar(&listaOrdenada);
+  int op;
+  char name[100], phone[20], mail[50];
+  do{
+    mostrarOpcoes();
+    scanf("%d",&op);
+    switch(op){
+      case 1:
+        setbuf(stdin,NULL);
+        printf("\nDiga o nome do contato: ");
+        fgets(name,100,stdin);
+        if (jaExiste(&listaOrdenada, name) == 0){
+          setbuf(stdin,NULL);
+          printf("Diga o número do contato: ");
+          fgets(phone,20,stdin);
+          setbuf(stdin,NULL);
+          printf("Diga o e-mail do contato: ");
+          fgets(mail,50,stdin);
+        
+          adicionar(&listaOrdenada,100,name,20,phone, 50,mail);
+          listaOrdenada.qtd++;
+          printf("Adicionado com sucesso!\n");
+          
+        } else{
+          printf("O nome não pode ser repetido!\n");
+        }
+        
+        break;
+      case 2:
+        if (isEmpty(&listaOrdenada)==0){
+          printf("Diga qual contato deseja retirar: ");
+          setbuf(stdin,NULL);
+          fgets(name,100,stdin);
+          remover(&listaOrdenada, name);
+          
+        } else{
+          printf("Lista vazia!\n");
+        }
+        
+        break;
+      case 3:
+        if (isEmpty(&listaOrdenada)==1){
+          printf("Lista vazia\n");
+        } else{
+          imprimir(listaOrdenada);
+        }
+        break;
+      case 4:
+        if (isEmpty(&listaOrdenada)==0){
+          printf("Diga qual contato deseja procurar: ");
+          setbuf(stdin,NULL);
+          fgets(name,100,stdin);
+          if (procurar(&listaOrdenada, name)!=NULL){
+            printf("Endereço: %p\n", procurar(&listaOrdenada, name));
+          } else{
+            printf("Contato não existe na lista!\n");
+          }          
+        } else{
+          printf("Lista vazia, não dá para procurar nada!\n");
+        }
+        break;
+      case 5:
+        if (isEmpty(&listaOrdenada)==0){
+          printf("Diga qual contato deseja alterar: ");
+          setbuf(stdin,NULL);
+          fgets(name,100,stdin);
+          alterar(&listaOrdenada, name);
+
+        }else{
+          printf("Lista vazia, não dá para alterar nada!\n");
+          break;
+      case 0:
+          printf("Fim de programa!\n");
+          break;
+      default:
+          printf("Opção inválida!\n");
+        }
+    }
+    
+  } while(op != 0);
+
+
+  return 0;
+}
